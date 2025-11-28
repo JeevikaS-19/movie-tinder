@@ -13,9 +13,13 @@ export async function GET(request: NextRequest) {
     }
 
     const page = request.nextUrl.searchParams.get('page') || '1';
-    const response = await fetch(
-      `${TMDB_BASE_URL}/movie/popular?api_key=${TMDB_API_KEY}&page=${page}&language=en-US`,
-      { next: { revalidate: 3600 } } // Cache for 1 hour
+    const genre = request.nextUrl.searchParams.get('genre');
+
+    const url = genre
+      ? `${TMDB_BASE_URL}/discover/movie?api_key=${TMDB_API_KEY}&page=${page}&language=en-US&with_genres=${genre}&sort_by=popularity.desc`
+      : `${TMDB_BASE_URL}/movie/popular?api_key=${TMDB_API_KEY}&page=${page}&language=en-US`;
+
+    const response = await fetch(url, { next: { revalidate: 3600 } } // Cache for 1 hour
     );
 
     if (!response.ok) {
